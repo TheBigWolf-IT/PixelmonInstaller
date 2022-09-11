@@ -1,11 +1,14 @@
 #!/usr/bin/python
 
+from multiprocessing.connection import wait
+from time import sleep
 import tkinter
 import os
 import platform
 import threading
+import zipfile
 import wget
-import time
+from zipfile import ZipFile
 
 from unicodedata import name
 
@@ -17,7 +20,7 @@ from tkinter.ttk import Progressbar
 os_system = platform.system()
 path = 'none'
 downloading = False
-url = "https://speed.hetzner.de/100MB.bin"
+url = "https://www.dropbox.com/s/fwvipewveeiaga4/MCHeroes.zip?dl=1"
 #Functions
 
 def writePath():
@@ -64,10 +67,8 @@ def setDownloadStart():
         downloading = True
         putDownloadBar()
         checkIfAlreadyExisting()
-        #startDownload()
         background_thread= threading.Thread(target=startDownload, args=(path, url))
         background_thread.start()
-        print("hello")
     else:
         messagebox.showinfo("Attenzione", "Download già avviato!")
 
@@ -79,22 +80,50 @@ def setDownloadStop():
 def checkIfAlreadyExisting():
     global path
     global url
-    tempfile = os.path.join(path, wget.filename_from_url(url))
-    print(tempfile)
+    tempfile = os.path.join(path, wget.filename_from_url(url)).replace("\\","/")
     if (os.path.exists(tempfile) == True):
         os.remove(tempfile)
 
 def progressionBarUpdater(current, total, width=80):
     setProgress(current, total)
 
-
 def startDownload(path, url):
     wget.download(url, path, bar=progressionBarUpdater)
+    startUnzip(path)
+
+def startUnzip(path):
+    filepath = os.path.join(path, wget.filename_from_url(url)).replace("\\","/")
+    zf = zipfile.ZipFile(filepath)
+
+    uncompress_size = sum((file.file_size for file in zf.infolist()))
+
+    extracted_size = 0
+
+    for file in zf.infolist():
+        extracted_size += file.file_size
+        setFinalProgress(extracted_size, uncompress_size)
+        zf.extract(file, path=path)
+    zf.close()
+    sleep(3)
+    deleteDownloadZip(filepath)
+
+def deleteDownloadZip(filepath):
+    if (os.path.exists(filepath) == True):
+        os.remove(filepath)
+    finishedPrompt()
+
+def finishedPrompt():
+    messagebox.showinfo("Successo!", "Pixelmon installata, ora puoi chiudere il programma, Buon Game!")
 
 def setProgress(current, total):
     global progress
     size = (current / total * 100)
     progress['value'] = size / 2
+
+def setFinalProgress(current, total):
+    global progress
+    size = (current / total * 100)
+    progress['value'] = size
 
 def putDownloadBar():
     global progress
