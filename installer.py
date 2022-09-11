@@ -3,9 +3,13 @@
 import tkinter
 import os
 import platform
+import threading
 import wget
+import time
 
-from tkinter import END, HORIZONTAL, INSERT, W, Button, PhotoImage, StringVar, Tk, Canvas, Label, filedialog
+from unicodedata import name
+
+from tkinter import END, HORIZONTAL, INSERT, Button, PhotoImage, StringVar, Tk, Canvas, Label, filedialog
 from tkinter import messagebox
 from tkinter.ttk import Progressbar
 
@@ -13,7 +17,7 @@ from tkinter.ttk import Progressbar
 os_system = platform.system()
 path = 'none'
 downloading = False
-
+url = "https://speed.hetzner.de/100MB.bin"
 #Functions
 
 def writePath():
@@ -53,27 +57,49 @@ def getOs():
 
 def setDownloadStart():
     global downloading
+    global path
+    global url
+    global progress
     if (downloading == False):
         downloading = True
         putDownloadBar()
-        setProgress()
-        wget.download()
+        checkIfAlreadyExisting()
+        #startDownload()
+        background_thread= threading.Thread(target=startDownload, args=(path, url))
+        background_thread.start()
+        print("hello")
     else:
         messagebox.showinfo("Attenzione", "Download già avviato!")
+
 
 def setDownloadStop():
     global downloading
     downloading = False
 
-def setProgress():
-    global my_progress
-    if my_progress['value'] < 100:
-        my_progress['value'] += 10
+def checkIfAlreadyExisting():
+    global path
+    global url
+    tempfile = os.path.join(path, wget.filename_from_url(url))
+    print(tempfile)
+    if (os.path.exists(tempfile) == True):
+        os.remove(tempfile)
+
+def progressionBarUpdater(current, total, width=80):
+    setProgress(current, total)
+
+
+def startDownload(path, url):
+    wget.download(url, path, bar=progressionBarUpdater)
+
+def setProgress(current, total):
+    global progress
+    size = (current / total * 100)
+    progress['value'] = size / 2
 
 def putDownloadBar():
-    global my_progress
-    my_progress = Progressbar(screen, orient= HORIZONTAL, length= 1000, mode= "determinate")
-    my_progress.pack()
+    global progress
+    progress = Progressbar(screen, orient= HORIZONTAL, length= 1000, mode= "determinate")
+    progress.pack()
 
 #Hide the button (thx Isaac)
 class CanvasButton:
