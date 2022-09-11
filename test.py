@@ -1,7 +1,14 @@
 #!/usr/bin/python
 
+from msilib.schema import Dialog
 import tkinter
+import os
+import platform
+
 from tkinter import Button, PhotoImage, Tk, Canvas, Label
+from os import getlogin
+from tkinter import simpledialog
+from tkinter import messagebox
 
 #Hide the button (thx Isaac)
 class CanvasButton:
@@ -28,7 +35,7 @@ screen = tkinter.Tk()
 screen.title("TheBigWolf Pixelmon Installer")
 #Resolution
 screen.geometry("1000x606")
-
+screen.resizable(False,False)
 #Background
 background_img = tkinter.PhotoImage(file="background.png")
 canvas = tkinter.Canvas(screen, bg="white", height=1000	, width=1000, bd=0, highlightthickness=0, relief="ridge")
@@ -40,6 +47,25 @@ background = canvas.create_image(500, 303, anchor='c', image=background_img)
 install_button = CanvasButton(canvas, 501, 304, BUTTON_IMG_PATH, command=exit)
 
 
+
+
+
+
+#Version
+os_system = platform.system()
+
+path= "none"
+
+if (os_system == "Windows"):
+    path = os.path.join("C:\\Users",os.getlogin(),"AppData\\Roaming\\.minecraft")
+elif(os_system == "Darwin"):
+    path = os.path.join("~/Library/Application Support/minecraft")
+elif(os_system == "Linux"):
+    path = os.path.join("~/.minecraft")
+else:
+    messagebox.showerror("Errore", "Sistema operativo non riconosciuto!")
+    screen.destroy()
+
+print(path)
 #End
-screen.resizable(False,False)
 screen.mainloop()
