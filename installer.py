@@ -3,16 +3,16 @@
 import tkinter
 import os
 import platform
+import wget
 
-from tkinter import END, INSERT, Button, PhotoImage, StringVar, Tk, Canvas, Label, filedialog
+from tkinter import END, HORIZONTAL, INSERT, W, Button, PhotoImage, StringVar, Tk, Canvas, Label, filedialog
 from tkinter import messagebox
+from tkinter.ttk import Progressbar
 
-#variabili
+#Variables
 os_system = platform.system()
 path = 'none'
-downloading = True
-
-
+downloading = False
 
 #Functions
 
@@ -28,9 +28,52 @@ def clearPath():
 
 def getFolderPath():
     global path
-    path = filedialog.askdirectory(initialdir=path, title="Example")
+    global downloading
+    if (downloading == True):
+        messagebox.showinfo("Attenzione", "È già in corso l'installlazione del modpack")
+    else:
+        path = filedialog.askdirectory(initialdir=path, title="Example")
     clearPath()
+    if (path == ''):
+        getOs()
+        messagebox.showerror("Errore", "Nessuna cartella selezionate, usando il percorso predefinito")
     writePath()
+
+def getOs():
+    global path
+    if (os_system == "Windows"):
+        path = os.path.join("C:/Users",os.getlogin(),"AppData/Roaming/.minecraft").replace("\\","/")
+    elif(os_system == "Darwin"):
+        path = os.path.join(os.getlogin(),"/Library/Application Support/minecraft").replace("\\","/")
+    elif(os_system == "Linux"):
+        path = os.path.join(os.getlogin(),"/.minecraft").replace("\\","/")
+    else:
+         messagebox.showerror("Errore", "Sistema operativo non riconosciuto!")
+         screen.destroy()
+
+def setDownloadStart():
+    global downloading
+    if (downloading == False):
+        downloading = True
+        putDownloadBar()
+        setProgress()
+        wget.download()
+    else:
+        messagebox.showinfo("Attenzione", "Download già avviato!")
+
+def setDownloadStop():
+    global downloading
+    downloading = False
+
+def setProgress():
+    global my_progress
+    if my_progress['value'] < 100:
+        my_progress['value'] += 10
+
+def putDownloadBar():
+    global my_progress
+    my_progress = Progressbar(screen, orient= HORIZONTAL, length= 1000, mode= "determinate")
+    my_progress.pack()
 
 #Hide the button (thx Isaac)
 class CanvasButton:
@@ -54,17 +97,7 @@ BUTTON_IMG_PATH = "install.png"
 
 #Version
 
-if (os_system == "Windows"):
-    path = os.path.join("C:/Users",os.getlogin(),"AppData/Roaming/.minecraft").replace("\\","/")
-elif(os_system == "Darwin"):
-    path = os.path.join(os.getlogin(),"/Library/Application Support/minecraft").replace("\\","/")
-elif(os_system == "Linux"):
-    path = os.path.join(os.getlogin(),"/.minecraft").replace("\\","/")
-else:
-    messagebox.showerror("Errore", "Sistema operativo non riconosciuto!")
-    screen.destroy()
-print(path)
-
+getOs()
 
 #Open
 screen = tkinter.Tk()
@@ -86,7 +119,7 @@ canvas.place(x=0, y=0)
 background = canvas.create_image(500, 303, anchor='c', image=background_img)
 
 #Buttons
-install_button = CanvasButton(canvas, 501, 304, BUTTON_IMG_PATH, command=exit)
+install_button = CanvasButton(canvas, 501, 304, BUTTON_IMG_PATH, command=setDownloadStart)
 selectdir_button = Button(text="...", bg="white", highlightcolor="white", command=getFolderPath)
 selectdir_button.place(x=753, y=410)
 #Text
