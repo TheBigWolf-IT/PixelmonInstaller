@@ -20,7 +20,7 @@ from tkinter.ttk import Progressbar
 os_system = platform.system()
 path = 'none'
 downloading = False
-url = "https://www.dropbox.com/s/fwvipewveeiaga4/MCHeroes.zip?dl=1"
+url = "https://www.dropbox.com/s/ls6u78p6wv0e0hy/thebigwolf-pixelmon.zip?dl=1"
 #Functions
 
 def writePath():
