@@ -1,14 +1,36 @@
 #!/usr/bin/python
 
-from msilib.schema import Dialog
 import tkinter
 import os
 import platform
 
-from tkinter import Button, PhotoImage, Tk, Canvas, Label
-from os import getlogin
-from tkinter import simpledialog
+from tkinter import END, INSERT, Button, PhotoImage, StringVar, Tk, Canvas, Label, filedialog
 from tkinter import messagebox
+
+#variabili
+os_system = platform.system()
+path = 'none'
+downloading = True
+
+
+
+#Functions
+
+def writePath():
+    showdir['state'] = 'normal'
+    showdir.insert(INSERT, path)
+    showdir['state'] = 'disabled'
+
+def clearPath():
+    showdir['state'] = 'normal'
+    showdir.delete('1.0', END)
+    showdir['state'] = 'disabled'
+
+def getFolderPath():
+    global path
+    path = filedialog.askdirectory(initialdir=path, title="Example")
+    clearPath()
+    writePath()
 
 #Hide the button (thx Isaac)
 class CanvasButton:
@@ -30,12 +52,32 @@ class CanvasButton:
 
 BUTTON_IMG_PATH = "install.png"
 
+#Version
+
+if (os_system == "Windows"):
+    path = os.path.join("C:/Users",os.getlogin(),"AppData/Roaming/.minecraft").replace("\\","/")
+elif(os_system == "Darwin"):
+    path = os.path.join(os.getlogin(),"/Library/Application Support/minecraft").replace("\\","/")
+elif(os_system == "Linux"):
+    path = os.path.join(os.getlogin(),"/.minecraft").replace("\\","/")
+else:
+    messagebox.showerror("Errore", "Sistema operativo non riconosciuto!")
+    screen.destroy()
+print(path)
+
+
 #Open
 screen = tkinter.Tk()
 screen.title("TheBigWolf Pixelmon Installer")
+
 #Resolution
 screen.geometry("1000x606")
 screen.resizable(False,False)
+
+#Icon
+icon_img = tkinter.PhotoImage(file="icon.png")
+screen.iconphoto(True, icon_img)
+
 #Background
 background_img = tkinter.PhotoImage(file="background.png")
 canvas = tkinter.Canvas(screen, bg="white", height=1000	, width=1000, bd=0, highlightthickness=0, relief="ridge")
@@ -45,27 +87,14 @@ background = canvas.create_image(500, 303, anchor='c', image=background_img)
 
 #Buttons
 install_button = CanvasButton(canvas, 501, 304, BUTTON_IMG_PATH, command=exit)
+selectdir_button = Button(text="...", bg="white", highlightcolor="white", command=getFolderPath)
+selectdir_button.place(x=753, y=410)
+#Text
 
+showdir = tkinter.Text(screen, height=1, width=63)
+showdir['state'] = 'disabled'
+writePath()
+showdir.place(x=246, y=413)
 
-
-
-
-
-#Version
-os_system = platform.system()
-
-path= "none"
-
-if (os_system == "Windows"):
-    path = os.path.join("C:\\Users",os.getlogin(),"AppData\\Roaming\\.minecraft")
-elif(os_system == "Darwin"):
-    path = os.path.join("~/Library/Application Support/minecraft")
-elif(os_system == "Linux"):
-    path = os.path.join("~/.minecraft")
-else:
-    messagebox.showerror("Errore", "Sistema operativo non riconosciuto!")
-    screen.destroy()
-
-print(path)
 #End
 screen.mainloop()
