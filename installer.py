@@ -23,6 +23,11 @@ downloading = False
 url = "https://www.dropbox.com/s/ls6u78p6wv0e0hy/thebigwolf-pixelmon.zip?dl=1"
 #Functions
 
+#Necessary only for py-to-exe
+def resource_path(relative_path):
+    base_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
+    return os.path.join(base_path, relative_path)
+
 def writePath():
     showdir['state'] = 'normal'
     showdir.insert(INSERT, path)
@@ -148,7 +153,7 @@ class CanvasButton:
     def set_state(self, state):
         self.canvas.itemconfigure(self.canvas_btn_img_obj, state=state)
 
-BUTTON_IMG_PATH = "install.png"
+BUTTON_IMG_PATH = resource_path("install.png")
 
 #Version
 
@@ -163,11 +168,13 @@ screen.geometry("1000x606")
 screen.resizable(False,False)
 
 #Icon
-icon_img = tkinter.PhotoImage(file="icon.png")
+icon_path = resource_path("icon.png")
+icon_img = tkinter.PhotoImage(file=icon_path)
 screen.iconphoto(True, icon_img)
 
 #Background
-background_img = tkinter.PhotoImage(file="background.png")
+background_path = resource_path("background.png")
+background_img = tkinter.PhotoImage(file=background_path)
 canvas = tkinter.Canvas(screen, bg="white", height=1000	, width=1000, bd=0, highlightthickness=0, relief="ridge")
 canvas.place(x=0, y=0)
 
