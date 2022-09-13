@@ -8,6 +8,7 @@ import threading
 import zipfile
 import wget
 import json
+import sys
 
 from multiprocessing.connection import wait
 from time import sleep
@@ -113,7 +114,8 @@ def startUnzip(path):
         zf.extract(file, path=path)
     zf.close()
     sleep(3)
-    insertProfile(path)
+    if (os.path.exists(os.path.join(path, "launcher_profiles.json").replace("\\", "/"))):
+        insertProfile(path)
     deleteDownloadZip(filepath)
 
 def deleteDownloadZip(filepath):
@@ -123,6 +125,9 @@ def deleteDownloadZip(filepath):
 
 def insertProfile(path):
     filepath = os.path.join(path, "launcher_profiles.json").replace("\\","/")
+    value = os.path.join(path, "versions/1.16.5-TheBigWolf-Pixelmon").replace("/", "//").replace("\\", "//")
+    folder = {}
+    folder['gameDir'] = value
     data = {
         "thebigwolf-pixelmon": {
             "created": "2022-09-12T00:42:09.620Z",
@@ -133,13 +138,14 @@ def insertProfile(path):
             "type": "custom"
             }
     }
+    data['thebigwolf-pixelmon'].update(folder)
+
     if (os.path.exists(filepath) == True):
         with open((filepath), 'r+') as file:
             file_data = json.load(file)
             file_data['profiles'].update(data)
             file.seek(0)
             json.dump(file_data, file, indent = 2)
-
 
 def finishedPrompt():
     messagebox.showinfo("Successo!", "Pixelmon installata, ora ti basterà avviare il launcher e se non hai mai avviato la 1.16.5 dovrai prima avviare la 1.16.5 e poi potrai avviare la pixelmon!")
