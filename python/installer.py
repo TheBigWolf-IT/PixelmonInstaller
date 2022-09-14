@@ -1,6 +1,5 @@
 #!/usr/bin/python
 
-
 import tkinter
 import os
 import platform
@@ -25,7 +24,7 @@ path = 'none'
 downloading = False
 already_downloaded = 0
 pack_url = "https://www.dropbox.com/s/ls6u78p6wv0e0hy/thebigwolf-pixelmon.zip?dl=1"
-profile_url = "https://raw.githubusercontent.com/TheBigWolf-IT/PixelmonInstaller/main/test.json"
+profile_url = "https://raw.githubusercontent.com/TheBigWolf-IT/PixelmonInstaller/main/mcfiles/launcher_profiles.json"
 
 #Functions
 
@@ -91,7 +90,7 @@ def setDownloadStart():
     global downloading
     global path
     global pack_url
-    global json_url
+    global profile_url
     global progress
 
     if (downloading == False):
@@ -101,7 +100,7 @@ def setDownloadStart():
         background_thread= threading.Thread(target=startDownload, args=(path, pack_url))
         background_thread.start()
         if (os.path.exists(os.path.join(path, "launcher_profiles.json").replace("\\", "/"))):
-            insertProfile(path, json_url)
+            insertProfile(path, profile_url)
 
     else:
         messagebox.showinfo("Attenzione", "Download già avviato!")
@@ -147,12 +146,12 @@ def deleteDownloadZip(filepath):
         os.remove(filepath)
     finishedPrompt()
 
-def insertProfile(path, json_url):
+def insertProfile(path, profile_url):
     filepath = os.path.join(path, "launcher_profiles.json").replace("\\","/")
     value = os.path.join(path, "versions/1.16.5-TheBigWolf-Pixelmon").replace("/", "//").replace("\\", "//")
     folder_profile = {}
     folder_profile['gameDir'] = value
-    profile_json = requests.get(json_url)
+    profile_json = requests.get(profile_url)
     data = json.loads(profile_json.text)
     data['thebigwolf-pixelmon'].update(folder_profile)
 
