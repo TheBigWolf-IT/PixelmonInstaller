@@ -22,13 +22,13 @@ from tkinter.ttk import Progressbar
 os_system = platform.system()
 path = 'none'
 downloading = False
-already_downloaded = 0
 global_urls = "https://raw.githubusercontent.com/TheBigWolf-IT/PixelmonInstaller/main/urls/urls.json"
 
 urls = requests.get(global_urls)
 urls_json = json.loads(urls.text)
-profile_url = data['profiles']
-pack_url = data['pack']
+#This is so that if i need to change links i don't have to recompile a new version
+profile_url = urls_json['profiles']
+pack_url = urls_json['pack']
 
 #Functions
 
