@@ -23,8 +23,12 @@ os_system = platform.system()
 path = 'none'
 downloading = False
 already_downloaded = 0
-pack_url = "https://www.dropbox.com/s/ls6u78p6wv0e0hy/thebigwolf-pixelmon.zip?dl=1"
-profile_url = "https://raw.githubusercontent.com/TheBigWolf-IT/PixelmonInstaller/main/mcfiles/launcher_profiles.json"
+global_urls = "https://raw.githubusercontent.com/TheBigWolf-IT/PixelmonInstaller/main/urls/urls.json"
+
+urls = requests.get(global_urls)
+urls_json = json.loads(urls.text)
+profile_url = data['profiles']
+pack_url = data['pack']
 
 #Functions
 
